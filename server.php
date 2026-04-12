@@ -16,7 +16,11 @@ while (true) {
     $client_ip = '';
     $client_port = 0;
 
-    socket_recvfrom($socket, $buf, 1024, 0, $client_ip, $client_port);
+    $bytes = @socket_recvfrom($socket, $buf, 1024, 0, $client_ip, $client_port);
+
+if ($bytes === false) {
+    continue;
+}
 
     $client_key = "$client_ip:$client_port";
     $clients[$client_key] = time();
