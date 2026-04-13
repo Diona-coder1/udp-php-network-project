@@ -22,10 +22,10 @@ while (true) {
         continue;
     }
 
-    $client_key = "$client_ip:$client_port"; // 🔥 duhet këtu
-
+    $client_key = "$client_ip:$client_port";
     $max_clients = 3;
 
+    // Refuzon klientë nëse kalon limitin
     if (!isset($clients[$client_key]) && count($clients) >= $max_clients) {
         echo "Shumë klientë, refuzohet lidhja: $client_key\n";
 
@@ -34,14 +34,24 @@ while (true) {
         continue;
     }
 
+    // Ruan klientin
     $clients[$client_key] = time();
+
+    //  Shkruan klientët në clients.log (FIX path)
+    file_put_contents(__DIR__ . "/clients.log", implode("\n", array_keys($clients)));
+
+    // Ruajnë mesazhet
     $messages[] = "$client_key -> $buf";
+
+    //  Shkruan mesazhet në messages.log (FIX path)
+    file_put_contents(__DIR__ . "/messages.log", "$client_key -> $buf\n", FILE_APPEND);
 
     echo "Mesazh nga $client_ip:$client_port -> $buf\n";
 
     $response = "Mesazhi u pranua";
     socket_sendto($socket, $response, strlen($response), 0, $client_ip, $client_port);
 
+    // Timeout për klientët
     foreach ($clients as $client => $last_time) {
         if (time() - $last_time > 30) {
             unset($clients[$client]);
@@ -49,4 +59,5 @@ while (true) {
         }
     }
 }
+
 ?>
