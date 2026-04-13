@@ -18,26 +18,35 @@ while (true) {
 
     $bytes = @socket_recvfrom($socket, $buf, 1024, 0, $client_ip, $client_port);
 
-if ($bytes === false) {
-    continue;
-}
+    if ($bytes === false) {
+        continue;
+    }
 
-    $client_key = "$client_ip:$client_port";
+    $client_key = "$client_ip:$client_port"; // 🔥 duhet këtu
+
+    $max_clients = 3;
+
+    if (!isset($clients[$client_key]) && count($clients) >= $max_clients) {
+        echo "Shumë klientë, refuzohet lidhja: $client_key\n";
+
+        $response = "Serveri është i mbingarkuar";
+        socket_sendto($socket, $response, strlen($response), 0, $client_ip, $client_port);
+        continue;
+    }
+
     $clients[$client_key] = time();
-
     $messages[] = "$client_key -> $buf";
 
     echo "Mesazh nga $client_ip:$client_port -> $buf\n";
 
     $response = "Mesazhi u pranua";
     socket_sendto($socket, $response, strlen($response), 0, $client_ip, $client_port);
-    
+
     foreach ($clients as $client => $last_time) {
-    if (time() - $last_time > 30) {
-        unset($clients[$client]);
-        echo "Klienti $client u largua (timeout)\n";
+        if (time() - $last_time > 30) {
+            unset($clients[$client]);
+            echo "Klienti $client u largua (timeout)\n";
+        }
     }
 }
-}
-
 ?>
