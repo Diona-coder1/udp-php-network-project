@@ -15,4 +15,15 @@ function sanitizePath($basePath, $filename) {
     }
     return $realPath;
 }
+// ================== FILE SYSTEM ==================
+function listFiles($path) {
+    $files = array_diff(scandir($path), array('.', '..'));
+    return empty($files) ? "No files found" : implode("\n", $files);
+}
+
+function readFileContent($path, $filename) {
+    $file = sanitizePath($path, $filename);
+    if (!$file || !file_exists($file)) return "❌ File not found";
+    return file_get_contents($file);
+}
 
