@@ -26,4 +26,17 @@ function readFileContent($path, $filename) {
     if (!$file || !file_exists($file)) return "❌ File not found";
     return file_get_contents($file);
 }
+function uploadFile($path, $filename, $content) {
+    if (empty($filename)) return "❌ Filename required";
+
+    $file = $path . basename($filename);
+
+    if (file_exists($file)) {
+        return "❌ File already exists";
+    }
+
+    file_put_contents($file, $content);
+    return "✅ File uploaded successfully";
+}
+
 
