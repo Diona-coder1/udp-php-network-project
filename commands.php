@@ -52,7 +52,7 @@ function deleteFile($path, $filename) {
 }
 
 function searchFiles($path, $keyword) {
-    if (empty($keyword)) return "❌ Keyword required";
+    if (empty($keyword)) return " Keyword required";
 
     $files = array_diff(scandir($path), array('.', '..'));
     $results = array_filter($files, fn($f) => stripos($f, $keyword) !== false);
@@ -67,7 +67,52 @@ function fileInfo($path, $filename) {
     $created = date("Y-m-d H:i:s", filectime($file));
     $modified = date("Y-m-d H:i:s", filemtime($file));
 
-    return "📄 File: $filename\n📦 Size: $size bytes\n🕒 Created: $created\n✏️ Modified: $modified";
+    return " File: $filename\n Size: $size bytes\n Created: $created\n Modified: $modified";
 }
+
+// ================== COMMAND HANDLER ==================
+function handleCommand($input, $clientId, $path) {
+    $parts = explode(" ", trim($input));
+    $command = strtolower($parts[0]);
+    $args = array_slice($parts, 1);
+
+    $admin = isAdmin($clientId);
+
+    switch ($command) {
+
+        case "/list":
+            return listFiles($path);
+
+        case "/read":
+            if (empty($args[0])) return "Filename required";
+            return readFileContent($path, $args[0]);
+            case "/upload":
+            if (!$admin) return "Permission denied";
+            if (empty($args[0])) return "Filename required";
+            if (count($args) < 2) return " File content required";
+            return uploadFile($path, $args[0], implode(" ", array_slice($args, 1)));
+
+        case "/download":
+            if (empty($args[0])) return " Filename required";
+            return downloadFile($path, $args[0]);
+
+        case "/delete":
+            if (!$admin) return " Permission denied";
+            if (empty($args[0])) return "Filename required";
+            return deleteFile($path, $args[0]);
+
+        case "/search":
+            if (empty($args[0])) return " Keyword required";
+            return searchFiles($path, $args[0]);
+
+        case "/info":
+            if (empty($args[0])) return "Filename required";
+            return fileInfo($path, $args[0]);
+
+        default:
+            return " Unknown command";
+    }
+}
+    
 
 
