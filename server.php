@@ -35,11 +35,6 @@ while (true) {
     $user = "unknown";
     $msg = $buf;
 
-    if (strpos($buf, "|") !== false) {
-    list($user, $msg) = explode("|", $buf, 2);
-    $clients[$client_key]["user"] = $user;
-    }
-
     // Limit
     if (!isset($clients[$key]) && count($clients) >= $max_clients) {
          $response = "Server full (max $max_clients clients)";
