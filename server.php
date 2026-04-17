@@ -1,4 +1,5 @@
 <?php
+set_time_limit(0);
 
 $ip = "0.0.0.0";
 $port = 5000;
@@ -6,24 +7,22 @@ $port = 5000;
 $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 socket_bind($socket, $ip, $port);
 
-echo "Serveri është duke dëgjuar në $ip:$port...\n";
+echo "Server running on $ip:$port...\n";
 
 $clients = [];
-$messages = [];
+
 
 while (true) {
     $buf = '';
     $client_ip = '';
     $client_port = 0;
 
-    $bytes = @socket_recvfrom($socket, $buf, 1024, 0, $client_ip, $client_port);
-
-    if ($bytes === false) {
-        continue;
-    }
+    socket_recvfrom($socket, $buf, 2048, 0, $client_ip, $client_port);
+     if (!$buf) continue;
 
     $client_key = "$client_ip:$client_port";
-    $max_clients = 3;
+    $max_clients = 4;
+    $timeout = 30;
 
     // Refuzon klientë nëse kalon limitin
     if (!isset($clients[$client_key]) && count($clients) >= $max_clients) {
