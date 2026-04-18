@@ -120,7 +120,3 @@ function handleCommand($input, $role, $path) {
 }
 
 ?>
-
-    
-
-
