@@ -18,6 +18,12 @@ echo "HTTP Stats Server running on http://localhost:$port/stats\n";
 
 
 
+function read_file_safe($file) {
+    if (!file_exists($file)) {
+        return [];
+    }
+    return file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+}
 
 
 
@@ -34,8 +40,57 @@ while (true) {
     if ($client === false) {
         continue;
     }
+    $request = socket_read($client, 1024);
 
-    $response = "Hello from server";
+if (preg_match('#GET /stats#', $request)) {
+
+    $response =
+        "HTTP/1.1 200 OK\r\n\r\n" .
+        "Stats endpoint working";
+
+} else {
+
+    $response =
+        "HTTP/1.1 404 Not Found\r\n\r\nNot Found";
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     socket_write($client, $response);
 
@@ -47,41 +102,6 @@ while (true) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-function read_file_safe($file) {
-    if (!file_exists($file)) {
-        return [];
-    }
-    return file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-}
-
-$clients_file = __DIR__ . "/clients.log";
-$messages_file = __DIR__ . "/messages.log";
-
-$clients = read_file_safe($clients_file);
-$messages = read_file_safe($messages_file);
-
-$unique_ips = array_values(array_unique($clients));
-
-$response = [
-    "status" => "OK",
-    "active_clients" => count($unique_ips),
-    "ip_addresses" => $unique_ips,
-    "messages_count" => count($messages),
-    "messages" => array_slice($messages, -50)
-];
 
 
 ?>
