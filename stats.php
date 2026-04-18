@@ -43,6 +43,22 @@ while (true) {
     $request = socket_read($client, 1024);
 
 if (preg_match('#GET /stats#', $request)) {
+$clients_file = __DIR__ . "/clients.log";
+$messages_file = __DIR__ . "/messages.log";
+
+$clients = read_file_safe($clients_file);
+$messages = read_file_safe($messages_file);
+
+$unique_clients = array_values(array_unique($clients));
+
+$data = json_encode([
+    "status" => "OK",
+    "active_clients" => count($unique_clients),
+    "ip_addresses" => $unique_clients,
+    "messages_count" => count($messages),
+    "messages" => array_slice($messages, -50)
+], JSON_PRETTY_PRINT);
+
 
     $response =
         "HTTP/1.1 200 OK\r\n\r\n" .
@@ -53,41 +69,6 @@ if (preg_match('#GET /stats#', $request)) {
     $response =
         "HTTP/1.1 404 Not Found\r\n\r\nNot Found";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
