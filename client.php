@@ -20,7 +20,7 @@ if (!socket_listen($socket)) {
 
 echo "HTTP Stats Server running on http://localhost:$port/stats\n";
 
-// funksion për lexim të sigurt
+// funksion për lexim të sigurt 
 function read_file_safe($file) {
     if (!file_exists($file)) return [];
     return file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
