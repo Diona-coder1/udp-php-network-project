@@ -1,0 +1,37 @@
+login
+admin
+>> login
+SERVER: Type role: admin / user
+>> admin
+SERVER: Logged in as admin
+>> /list
+/upload test.txt|pershendetje nga diona
+/info test.txt
+/download test.txt
+login
+admin
+/list
+/upload file1.txt|pershendetje nga diona
+/read file1.txt
+/search file
+/info file1.txt
+/download file1.txt
+/delete file1.txt
+login
+user
+/list
+hello
+login
+admin
+>> /list
+>> /read test.txt
+>> /upload test.txt|Pershendetje kjo eshte permbajtja
+>> /download test.txt
+downloaded.txt
+>> /delete test.txt
+>> /search test
+>> /info test.txt
+>> hello server
+login
+user
+/list

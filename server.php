@@ -32,9 +32,6 @@ while (true) {
 
     $key = "$client_ip:$client_port";
 
-    $user = "unknown";
-    $msg = $buf;
-
     // Limit
     if (!isset($clients[$key]) && count($clients) >= $max_clients) {
          $response = "Server full (max $max_clients clients)";
@@ -54,6 +51,7 @@ while (true) {
     } else {
         $clients[$key]["last"] = time();
     }
+
     // PARSE
     $user = "unknown";
     $msg = $buf;
@@ -92,6 +90,7 @@ while (true) {
             $response = "Admin message received";
         }
     }
+    
     // USER
     elseif ($clients[$key]["role"] === "user") {
         usleep(500000); // slower response
@@ -106,25 +105,29 @@ while (true) {
         $response = "Please login first";
     }
 
-    //  Shkruan klientët në clients.log (FIX path)
-    file_put_contents(__DIR__ . "/clients.log", implode("\n", array_keys($clients)));
+   // LOGGING
+    $message_count++;
+    $log = "$key [$user] -> $msg";
 
-    // Ruajnë mesazhet
-    $messages[] = "$client_key -> $buf";
+    file_put_contents("clients.log", $key . "\n", FILE_APPEND);
+    file_put_contents("commands.log", $msg . "\n", FILE_APPEND);
+    file_put_contents("messages.log", $log . "\n", FILE_APPEND);
 
-    //  Shkruan mesazhet në messages.log (FIX path)
-    file_put_contents(__DIR__ . "/messages.log", "$client_key -> $buf\n", FILE_APPEND);
+    // STATS
+    file_put_contents($dataDir . "stats.json", json_encode([
+        "active_clients" => array_map(fn($c) => $c["user"], $clients),
+        "total_clients" => count($clients),
+        "messages" => $message_count,
+        "timestamp" => date("Y-m-d H:i:s")
+    ], JSON_PRETTY_PRINT));
 
-    echo "Mesazh nga $client_ip:$client_port -> $buf\n";
-
-    $response = "Mesazhi u pranua";
     socket_sendto($socket, $response, strlen($response), 0, $client_ip, $client_port);
 
-    // Timeout për klientët
-    foreach ($clients as $client => $last_time) {
-        if (time() - $last_time > 30) {
-            unset($clients[$client]);
-            echo "Klienti $client u largua (timeout)\n";
+    // TIMEOUT
+    foreach ($clients as $k => $c) {
+        if (time() - $c["last"] > $timeout) {
+            unset($clients[$k]);
+            echo "Client $k removed (timeout)\n";
         }
     }
 }
