@@ -1,6 +1,6 @@
 <?php
 
-$serverIP = "127.0.0.1";
+$serverIP = "192.168.178.44";
 $serverPort = 5000;
 
 $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
