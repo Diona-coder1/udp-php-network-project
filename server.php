@@ -92,14 +92,17 @@ while (true) {
     }
     
     // USER
+   
     elseif ($clients[$key]["role"] === "user") {
         usleep(500000); // slower response
-        if (strpos($msg, "/") === 0) {
-            $response = "Permission denied";
-        } else {
-            $response = "User message received";
-        }
-    }
+       if (strpos($msg, "/read") === 0 || strpos($msg, "/list") === 0) {
+        $response = handleCommand($msg, "user", $fileDir);
+      } elseif (strpos($msg, "/") === 0) {
+        $response = "Permission denied";
+      } else {
+        $response = "User message received";
+      }
+   }
 
     else {
         $response = "Please login first";
